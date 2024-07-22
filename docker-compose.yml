@@ -1,0 +1,54 @@
+networks:
+  main: null
+
+version: '2'
+
+services:
+
+  dev_db:
+    container_name: dev_db
+    environment:
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+    image: postgres:12
+    networks:
+      main:
+        aliases:
+          - dev_db
+    ports:
+      - 6000:5432
+    volumes:
+      - $HOME/data:/var/lib/postgresql/data
+
+  jsp-redis:
+    container_name: jsp-redis
+    image: redis
+    networks:
+      main:
+        aliases:
+          - jsp-redis
+
+  jsp-web:
+    build: .
+    image: jsp
+    working_dir: /src
+    container_name: jsp-web
+    environment:
+      - DATABASE_USERNAME=docker
+      - DATABASE_PASSWORD=docker
+      - DATABASE_PORT=5432
+      - DATABASE_HOST=dev_db
+    depends_on:
+      - dev_db
+      - jsp-redis
+    networks:
+      main:
+        aliases:
+          - jsp
+    ports:
+      - 3012:3012
+    privileged: true
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/src

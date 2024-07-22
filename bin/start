@@ -1,0 +1,39 @@
+#!/usr/bin/env sh
+
+# remove PID file
+# rm "/tmp/pids/server.pid"
+
+# Getting current rails env, if its set we will use that, else defaulting to development
+CURRENT_ENVIRONMENT="${RAILS_ENV:-development}"
+
+echo "starting the rails server in $CURRENT_ENVIRONMENT mode"
+
+# if we are running on development alone we will require foreman
+# on production and staging since assets are precompiled
+# we dont need to watch for CSS changes hence we can directly run the rails server
+if [ "$CURRENT_ENVIRONMENT" = "production" ] || [ "$CURRENT_ENVIRONMENT" = "staging" ]; then
+  bin/rails server -p 3012 -b '0.0.0.0'
+else
+
+  # run bundle install just in-case something got changed
+  # this will not be required on deployment envs
+  bundle install
+
+  # run migration
+  rake db:migrate
+
+  # using foreman to run rails application
+  # check Procfile.start for task definitions
+
+  if ! gem list foreman -i --silent; then
+      echo "Installing foreman..."
+      gem install foreman
+  fi
+
+  # Let the debug gem allow remote connections,
+  # but avoid loading until `debugger` is called
+  export RUBY_DEBUG_OPEN="true"
+  export RUBY_DEBUG_LAZY="true"
+
+  exec foreman start -f Procfile.dev "$@"
+fi
