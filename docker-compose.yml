@@ -31,13 +31,10 @@ services:
   jsp-web:
     build: .
     image: jsp
-    working_dir: /src
+    working_dir: /rails
     container_name: jsp-web
-    environment:
-      - DATABASE_USERNAME=docker
-      - DATABASE_PASSWORD=docker
-      - DATABASE_PORT=5432
-      - DATABASE_HOST=dev_db
+    env_file:
+      - .env.development
     depends_on:
       - dev_db
       - jsp-redis
@@ -51,4 +48,4 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      - .:/src
+      - .:/rails

@@ -1,7 +1,14 @@
 #!/usr/bin/env sh
 
-# remove PID file
-# rm "/tmp/pids/server.pid"
+# Path to the PID file for removal
+PID_FILE="/rails/tmp/pids/server.pid"
+
+if [ -f "$PID_FILE" ]; then
+  echo "Removing existing PID file: $PID_FILE"
+  rm "$PID_FILE"
+else
+  echo "No PID file found at: $PID_FILE"
+fi
 
 # Getting current rails env, if its set we will use that, else defaulting to development
 CURRENT_ENVIRONMENT="${RAILS_ENV:-development}"
