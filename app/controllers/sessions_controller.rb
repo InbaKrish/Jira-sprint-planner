@@ -5,6 +5,10 @@ class SessionsController < ApplicationController
 
   def create
     user_info = request.env['omniauth.auth']
-    p user_info
+
+    # client = OAuth2::Client.new(ENV['ATLASSIAN_CLIENT_ID'], ENV['ATLASSIAN_CLIENT_SECRET'], site: 'https://rently.atlassian.net')
+    # access_token = OAuth2::AccessToken.new(client, user_info.credentials.token)
+
+    session[:token] = user_info.credentials.token
   end
 end
