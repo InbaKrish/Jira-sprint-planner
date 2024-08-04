@@ -29,7 +29,10 @@ services:
           - jsp-redis
 
   jsp-web:
-    build: .
+    build: 
+      context: .
+      args:
+        DOCKER_BUILD_ENV: development
     image: jsp
     working_dir: /rails
     container_name: jsp-web
